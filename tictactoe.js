@@ -1,152 +1,144 @@
-let options = [1,2,3,4,5,6,7,8,9]
-let pool = [1,2,3,4,5,6,7,8,9]
+(function() {
+    const ticTacToeOptions = [1,2,3,4,5,6,7,8,9]
+    const winningLines = [[1,2,3], [4,5,6], [7,8,9], [1,4,7], [2,5,8], [3,6,9], [1,5,9], [3,5,7]]
 
-let user = []
-let computerAI = []
-let userStarts = true
+    let pool = [1,2,3,4,5,6,7,8,9]
+    let compare = (haveFromThis, thisOptions) => haveFromThis.filter(v => thisOptions.includes(v));
 
+    let user = []
+    let computerAI = []
+    let userActive = true;
 
+    const onClick = (event) => {
+        const id = event.target.id
 
-const lineA = [1,2,3]
-const lineB = [4,5,6]
-const lineC = [7,8,9]
-const lineD = [1,4,7]
-const lineE = [2,5,8]
-const lineF = [3,6,9]
-const lineG = [1,5,9]
-const lineH = [3,5,7]
-const winningLines = [lineA, lineB, lineC, lineD, lineE, lineF, lineG, lineH]
+        if (compare(pool, id).length) {
+            userTurn(id);
+        }
 
-function computerWinningMove() {
-    let adquiredFromLine = (line, computerAI) => line.filter(v => computerAI.includes(v));
-    let noAnswer = 0;
-    let answerArray;
-
-    for (let i = 0; i < 8; i++) {
-        let ownedFromLine = adquiredFromLine(winningLines[i], computerAI)
-
-        if (ownedFromLine.length === 2) {
-            let temporaryAnswer = winningLines[i].filter(function(v) {
-                return !ownedFromLine.includes(v);
-            })
-            if (adquiredFromLine(pool, temporaryAnswer).length === 1) {
-                answerArray = temporaryAnswer;
-                break;
+        function userTurn(numberPicked) {
+            if (userActive === true) {
+                for (let i = 0; i < pool.length; i++) {
+                    if (pool[i] == numberPicked) {
+                        pool.splice(i, 1);
+                        user.push(parseInt(numberPicked));
+                        event.target.innerText = "X";
+                        userActive = false;
+                        checkWinTie(user);
+                    }
+                }
             }
         }
-    }
 
-    if (answerArray === undefined) {
-        return computerAvoidLossMove();
-    } else {
-        computerAI.push(answerArray[0]);
-        for (let i = 0; i < pool.length; i++) {
-            if (pool[i] === answerArray[0]) {
-                pool.splice(i, 1);
-                return checkWin(computerAI);
+        function checkWinTie(player) {
+            let result = document.getElementById("result")
+            let answer = false
+            let playerName;
+        
+            if (player === user) {
+                playerName = "User";
+            } else {
+                playerName = "AI";
+            }
+
+            for (let j = 0; j < 8; j++) {
+                let lineCount = compare(winningLines[j], player);
+                if (lineCount.length === 3) {
+                    answer = true
+                    break;
+                }
+            }
+        
+            if (answer === true) {
+                result.innerText = playerName + " Wins!";
+            } else if (player.length === 5) {
+                result.innerText = "Tie!"
+            } else {
+                if (player === user) {
+                    computerTurn();
+                } else {
+                    userActive = true;
+                }
             }
         }
-    }
-}
 
-function computerAvoidLossMove() {
-    let adquiredFromLine = (line, user) => line.filter(v => user.includes(v));
-    let noAnswer = 0;
-    let answerArray;
-
-    for (let i = 0; i < 8; i++) {
-        let ownedFromLine = adquiredFromLine(winningLines[i], user)
-
-        if (ownedFromLine.length === 2) {
-            let temporaryAnswer = winningLines[i].filter(function(v) {
-                return !ownedFromLine.includes(v);
-            })
-            if (adquiredFromLine(pool, temporaryAnswer).length === 1) {
-                answerArray = temporaryAnswer;
-                break;
+        function computerTurn() {
+            let noAnswer = 0;
+            let answerArray;
+        
+            for (let i = 0; i < 8; i++) {
+                let ownedFromLine = compare(winningLines[i], computerAI)
+        
+                if (ownedFromLine.length === 2) {
+                    let temporaryAnswer = winningLines[i].filter(function(v) {
+                        return !ownedFromLine.includes(v);
+                    })
+                    if (compare(pool, temporaryAnswer).length === 1) {
+                        answerArray = temporaryAnswer;
+                        break;
+                    }
+                }
+            }
+        
+            if (answerArray === undefined) {
+                return computerAvoidLossMove();
+            } else {
+                computerAI.push(answerArray[0]);
+                for (let i = 0; i < pool.length; i++) {
+                    if (pool[i] === answerArray[0]) {
+                        let AIAnswer = document.getElementById(pool[i]);
+                        AIAnswer.innerText = "O";
+                        pool.splice(i, 1);
+                        checkWinTie(computerAI);
+                    }
+                }
             }
         }
-    }
-
-    if (answerArray === undefined) {
-        return computerRandomMove();
-    } else {
-        computerAI.push(answerArray[0]);
-        for (let i = 0; i < pool.length; i++) {
-            if (pool[i] === answerArray[0]) {
-                pool.splice(i, 1);
-                return checkWin(user);
+        
+        function computerAvoidLossMove() {
+            let noAnswer = 0;
+            let answerArray;
+        
+            for (let i = 0; i < 8; i++) {
+                let ownedFromLine = compare(winningLines[i], user)
+        
+                if (ownedFromLine.length === 2) {
+                    let temporaryAnswer = winningLines[i].filter(function(v) {
+                        return !ownedFromLine.includes(v);
+                    })
+                    if (compare(pool, temporaryAnswer).length === 1) {
+                        answerArray = temporaryAnswer;
+                        break;
+                    }
+                }
+            }
+        
+            if (answerArray === undefined) {
+                return computerRandomMove();
+            } else {
+                computerAI.push(answerArray[0]);
+                for (let i = 0; i < pool.length; i++) {
+                    if (pool[i] === answerArray[0]) {
+                        let AIAnswer = document.getElementById(pool[i]);
+                        AIAnswer.innerText = "O";
+                        pool.splice(i, 1);
+                        checkWinTie(computerAI);
+                    }
+                }
             }
         }
-    }
-}
-
-function computerRandomMove() {
-    let  computerAnswer = Math.floor(Math.random() * pool.length);
-    let number = pool[computerAnswer];
-
-    pool.splice(computerAnswer, 1);
-    computerAI.push(number);
-    return checkWin(computerAI);
-}
-
-function checkWin(player) {
-    let compare = (line, player) => line.filter(v => player.includes(v)).length
-    let answer = false
-    let playerName;
-
-    if (player === user) {
-        playerName = "User";
-    } else {
-        playerName = "AI";
-    }
-
-    for (let i = 0; i < 8; i++) {
-        let lineCount = compare(winningLines[i], player);
-        if (lineCount === 3) {
-            answer = true
-            break;
+        
+        function computerRandomMove() {
+            let  computerAnswer = Math.floor(Math.random() * pool.length);
+            let number = pool[computerAnswer];
+            let AIAnswer = document.getElementById(number);
+        
+            pool.splice(computerAnswer, 1);
+            computerAI.push(number);
+            AIAnswer.innerText = "O";
+            checkWinTie(computerAI);
         }
-    }
-
-    if (answer === true) {
-        return playerName + " Wins";
-    } else {
-        return checkTie();
     }
     
-}
-
-function checkTie() {
-    if (pool.length === 0) {
-        return "Tie";
-    } else {
-        if (userStarts === true) {
-            userStarts = false;
-            return computerWinningMove();
-            checkStats();
-        } else {
-            userStarts = true;
-            checkStats();
-            return "user turn";
-        }
-    }
-}
-
-function userTurn(numberPicked) {
-    if (userStarts === true) {
-        for (let i = 0; i < pool.length; i++) {
-            if (pool[i] === numberPicked) {
-                pool.splice(i, 1);
-                user.push(numberPicked);
-                return checkWin(user);
-            }
-        }
-    }
-}
-
-function checkStats() {
-    console.log(pool);
-    console.log(computerAI);
-    console.log(user);
-}
+    document.addEventListener('click', onClick);
+})()
