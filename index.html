@@ -8,6 +8,13 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
+
+    <div class="gameOptions">
+        <div class="option singlePlayer" id="P1">Single-Player</div>
+        <div class="option multiPlayer" id="P2">Multi-Player</div>
+        <div class="option chooseX" id="X">X (starts first)</div>
+        <div class="option chooseO" id="O">O (starts second)</div>
+    </div>
     <div class="gameboard">
         <div class="ticTacToeOption" id="1"></div>
         <div class="ticTacToeOption" id="2"></div>
@@ -18,10 +25,14 @@
         <div class="ticTacToeOption" id="7"></div>
         <div class="ticTacToeOption" id="8"></div>
         <div class="ticTacToeOption" id="9"></div>
-        <div id="result"></div>
+    </div>
+    <div class="gameResults">
+        <div class="result" id="result"></div>
+        <div class="result" id="restart">Restart game?</div>
     </div>
 
-    <script src="tictactoe.js">
-    </script>
+    <script src="pubsub.js"></script>
+    <script src="choosesettings.js"></script>
+    <script src="tictactoe.js"></script>
 </body>
 </html>
